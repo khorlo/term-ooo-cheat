@@ -31,7 +31,6 @@ def manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dici
     return resultado
 
 def carregarDicionario():
-    #with open('palavras-5-letras-maiuscula-sem-acentos-utf8.txt', 'r') as dicionario:
     with open('palavras-5-letras-maiuscula.txt', 'r') as dicionario:
         return [line.rstrip() for line in dicionario]
 
@@ -94,12 +93,15 @@ def construirLayout():
         [teclado]
     ]
 
-janela = sg.Window("Trapaça term.ooo", construirLayout(), finalize=True)
-janela.bind('<BackSpace>', '-backspace-')
+def construirJanelaPrincipal():
+    janela = sg.Window("Trapaça term.ooo", construirLayout(), finalize=True)
+    janela.bind('<BackSpace>', '-backspace-')
+    return janela
+
+janela = construirJanelaPrincipal()
 
 while True:
     evento, valores = janela.read()
-    #print(evento, valores)
     if evento == sg.WIN_CLOSED:
         break
     elif evento.startswith('-campo-digitado-submit-'):
@@ -150,7 +152,6 @@ while True:
             janela['-campo-digitado-' + num_linha + '-' + str(max([0, num_coluna-1]))].update('')
     elif evento == '-reiniciar-tela-':
         janela.close()
-        janela = sg.Window("Trapaça term.ooo", construirLayout(), finalize=True)
-        janela.bind('<BackSpace>', '-backspace-')
+        janela = construirJanelaPrincipal()
 
 janela.close()
