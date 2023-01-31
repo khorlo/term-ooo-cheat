@@ -1,36 +1,38 @@
 import PySimpleGUI as sg
+import unidecode as uni
 
 MAX_LINHAS=9
 
-def removerPalavrasQueTemCertaLetra(dicionario, letraProcurada, posicao, mapa):
+def removerPalavrasQueTemCertaLetra(dicionario, letraProcuradaSemAcentos, posicao, mapa):
     removeSoDe1Posicao = False
     for i in range(5):
-        if ((mapa[i][1] == 'verde' and mapa[i][0] == letraProcurada) or 
-            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcurada)):
+        if ((mapa[i][1] == 'verde' and mapa[i][0] == letraProcuradaSemAcentos) or 
+            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcuradaSemAcentos)):
             removeSoDe1Posicao=True
     if removeSoDe1Posicao == True:
-        return [word for word in dicionario if word[posicao] != letraProcurada]
+        return [word for word in dicionario if uni.unidecode(word[posicao]) != letraProcuradaSemAcentos]
     else:   
-        return [word for word in dicionario if letraProcurada not in word]
+        return [word for word in dicionario if letraProcuradaSemAcentos not in uni.unidecode(word)]
 
-def manterSoPalavrasQueTemCertaLetraNaPosicaoEspecificada(dicionario, letra, posicao):
-    return [word for word in dicionario if letra == word[posicao]]
+def manterSoPalavrasQueTemCertaLetraNaPosicaoEspecificada(dicionario, letraProcuradaSemAcentos, posicao):
+    return [word for word in dicionario if letraProcuradaSemAcentos == uni.unidecode(word[posicao])]
 
-def manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, letraProcurada, posicao, mapa):
+def manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, letraProcuradaSemAcentos, posicao, mapa):
     resultado = []
     for palavra in dicionario:
         mantemPalavra = False
         for i in range(5):
-            if not(((mapa[i][1] == 'verde' and mapa[i][0] == letraProcurada) or 
-            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcurada))):
-                if (palavra[i] == letraProcurada and i != posicao):
+            if not(((mapa[i][1] == 'verde' and mapa[i][0] == letraProcuradaSemAcentos) or 
+            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcuradaSemAcentos))):
+                if (uni.unidecode(palavra[i]) == letraProcuradaSemAcentos and i != posicao):
                     mantemPalavra = True
         if mantemPalavra:
             resultado.append(palavra)
     return resultado
 
 def carregarDicionario():
-    with open('palavras-5-letras-maiuscula-sem-acentos-utf8.txt', 'r') as dicionario:
+    #with open('palavras-5-letras-maiuscula-sem-acentos-utf8.txt', 'r') as dicionario:
+    with open('palavras-5-letras-maiuscula.txt', 'r') as dicionario:
         return [line.rstrip() for line in dicionario]
 
 def construirLinhaDeCamposDigitaveis(numLinha):
@@ -104,7 +106,7 @@ while True:
         num_linha = int(evento.split('-')[4])
         mapa = []
         for posicao in range(5):
-            letra = janela['-campo-digitado-'+ str(num_linha) + '-'+str(posicao) ].get()
+            letra = uni.unidecode(janela['-campo-digitado-'+ str(num_linha) + '-'+str(posicao) ].get())
             verde = janela['-campo-digitado-radio-' + str(num_linha) + '-' + str(posicao) + '-verde'].get()
             amarelo = janela['-campo-digitado-radio-' + str(num_linha) + '-'+str(posicao) + '-amarelo'].get() 
             preto = janela['-campo-digitado-radio-' + str(num_linha) + '-'+str(posicao) + '-preto'].get()
