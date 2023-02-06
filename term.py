@@ -3,11 +3,11 @@ import unidecode as uni
 
 MAX_LINHAS=9
 
-def removerPalavrasQueTemCertaLetra(dicionario, letraProcuradaSemAcentos, posicao, mapa):
+def removerPalavrasQueTemCertaLetra(dicionario, letraProcuradaSemAcentos, posicao, mapaDeLetrasECoresDaLinhaPreenchida):
     removeSoDe1Posicao = False
     for i in range(5):
-        if ((mapa[i][1] == 'verde' and mapa[i][0] == letraProcuradaSemAcentos) or 
-            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcuradaSemAcentos)):
+        if ((mapaDeLetrasECoresDaLinhaPreenchida[i][1] == 'verde' and mapaDeLetrasECoresDaLinhaPreenchida[i][0] == letraProcuradaSemAcentos) or 
+            (mapaDeLetrasECoresDaLinhaPreenchida[i][1] == 'amarelo' and mapaDeLetrasECoresDaLinhaPreenchida[i][0] == letraProcuradaSemAcentos)):
             removeSoDe1Posicao=True
     if removeSoDe1Posicao == True:
         return [word for word in dicionario if uni.unidecode(word[posicao]) != letraProcuradaSemAcentos]
@@ -17,13 +17,13 @@ def removerPalavrasQueTemCertaLetra(dicionario, letraProcuradaSemAcentos, posica
 def manterSoPalavrasQueTemCertaLetraNaPosicaoEspecificada(dicionario, letraProcuradaSemAcentos, posicao):
     return [word for word in dicionario if letraProcuradaSemAcentos == uni.unidecode(word[posicao])]
 
-def manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, letraProcuradaSemAcentos, posicao, mapa):
+def manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, letraProcuradaSemAcentos, posicao, mapaDeLetrasECoresDaLinhaPreenchida):
     resultado = []
     for palavra in dicionario:
         mantemPalavra = False
         for i in range(5):
-            if not(((mapa[i][1] == 'verde' and mapa[i][0] == letraProcuradaSemAcentos) or 
-            (mapa[i][1] == 'amarelo' and mapa[i][0] == letraProcuradaSemAcentos))):
+            if not(((mapaDeLetrasECoresDaLinhaPreenchida[i][1] == 'verde' and mapaDeLetrasECoresDaLinhaPreenchida[i][0] == letraProcuradaSemAcentos) or 
+            (mapaDeLetrasECoresDaLinhaPreenchida[i][1] == 'amarelo' and mapaDeLetrasECoresDaLinhaPreenchida[i][0] == letraProcuradaSemAcentos))):
                 if (uni.unidecode(palavra[i]) == letraProcuradaSemAcentos and i != posicao):
                     mantemPalavra = True
         if mantemPalavra:
@@ -106,29 +106,29 @@ while True:
         break
     elif evento.startswith('-campo-digitado-submit-'):
         num_linha = int(evento.split('-')[4])
-        mapa = []
+        mapaDeLetrasECoresDaLinhaPreenchida = []
         for posicao in range(5):
             letra = uni.unidecode(janela['-campo-digitado-'+ str(num_linha) + '-'+str(posicao) ].get())
             verde = janela['-campo-digitado-radio-' + str(num_linha) + '-' + str(posicao) + '-verde'].get()
             amarelo = janela['-campo-digitado-radio-' + str(num_linha) + '-'+str(posicao) + '-amarelo'].get() 
             preto = janela['-campo-digitado-radio-' + str(num_linha) + '-'+str(posicao) + '-preto'].get()
             cor = 'verde' if verde else ('amarelo' if amarelo else 'preto') 
-            mapa.append([letra, cor])
+            mapaDeLetrasECoresDaLinhaPreenchida.append([letra, cor])
         # É preciso percorrer 2x por que pode ser que uma letra apareça preta no inicio da palavra e verde/amarela no final. 
         # Não podemos excluir todas as palavras com aquela letra, senao a palavra que tem a letra na posição correta
         # também é excluída.
         for posicao in range(5):
-            if mapa[posicao][1] == 'verde':
-                dicionario = manterSoPalavrasQueTemCertaLetraNaPosicaoEspecificada(dicionario, mapa[posicao][0], posicao)
-                janela['-teclado-' + mapa[posicao][0]].update(button_color=('White', 'Turquoise'))
+            if mapaDeLetrasECoresDaLinhaPreenchida[posicao][1] == 'verde':
+                dicionario = manterSoPalavrasQueTemCertaLetraNaPosicaoEspecificada(dicionario, mapaDeLetrasECoresDaLinhaPreenchida[posicao][0], posicao)
+                janela['-teclado-' + mapaDeLetrasECoresDaLinhaPreenchida[posicao][0]].update(button_color=('White', 'Turquoise'))
                 janela['-campo-digitado-' + str(num_linha) + '-' + str(posicao)].update(background_color='Turquoise')
-            elif mapa[posicao][1] == 'amarelo':
-                dicionario = manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, mapa[posicao][0], posicao, mapa)
-                janela['-teclado-' + mapa[posicao][0]].update(button_color=('White', 'Gold'))
+            elif mapaDeLetrasECoresDaLinhaPreenchida[posicao][1] == 'amarelo':
+                dicionario = manterSoPalavrasQueTemCertaLetraERemoverPalavrasComLetraNaPosicaoErrada(dicionario, mapaDeLetrasECoresDaLinhaPreenchida[posicao][0], posicao, mapaDeLetrasECoresDaLinhaPreenchida)
+                janela['-teclado-' + mapaDeLetrasECoresDaLinhaPreenchida[posicao][0]].update(button_color=('White', 'Gold'))
                 janela['-campo-digitado-' + str(num_linha) + '-' + str(posicao)].update(background_color='Gold')
-            elif mapa[posicao][1] == 'preto':
-                dicionario = removerPalavrasQueTemCertaLetra(dicionario, mapa[posicao][0], posicao, mapa)
-                janela['-teclado-' + mapa[posicao][0]].update(button_color=('LightGray', 'Gray'))
+            elif mapaDeLetrasECoresDaLinhaPreenchida[posicao][1] == 'preto':
+                dicionario = removerPalavrasQueTemCertaLetra(dicionario, mapaDeLetrasECoresDaLinhaPreenchida[posicao][0], posicao, mapaDeLetrasECoresDaLinhaPreenchida)
+                janela['-teclado-' + mapaDeLetrasECoresDaLinhaPreenchida[posicao][0]].update(button_color=('LightGray', 'Gray'))
                 janela['-campo-digitado-' + str(num_linha) + '-' + str(posicao)].update(background_color='Black')
             janela['-lista-de-palavras-lista-'].update(values=dicionario)
             janela['-lista-de-palavras-possibilidades-'].update('Possibilidades: ' + str(len(dicionario)))
