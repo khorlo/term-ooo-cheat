@@ -132,6 +132,9 @@ while True:
                 janela['-campo-digitado-' + str(num_linha) + '-' + str(posicao)].update(background_color='Black')
             janela['-lista-de-palavras-lista-'].update(values=dicionario)
             janela['-lista-de-palavras-possibilidades-'].update('Possibilidades: ' + str(len(dicionario)))
+        # Ao se clicar no botão calcular, já define próx campo digitável como foco
+        if num_linha < MAX_LINHAS - 1:
+            janela['-campo-digitado-'+ str(num_linha+1) + '-'+str(0) ].set_focus()
     elif evento.startswith('-campo-digitado-') and janela[evento].get() != '':
         num_linha = int(evento.split('-')[3])
         num_coluna = int(evento.split('-')[4])
